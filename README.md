@@ -1,2 +1,2 @@
 # kmlTakFlow
-node red flow that takes a kml feed and pushes placemark location data as CoT to ATAK via takserver or multicast
+Node-Red Flow to forward Placemark locations of a KML Network Link as CoT to ATAK via multicast or TAKServer. (used in conjunction with Ampledatas node-red-contrib-tak).
