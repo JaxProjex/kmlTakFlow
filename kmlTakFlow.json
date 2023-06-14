@@ -1,0 +1,288 @@
+[
+    {
+        "id": "8236578b47cc319d",
+        "type": "tab",
+        "label": "kmlTakFlow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6f851fb883d564a2",
+        "type": "http request",
+        "z": "8236578b47cc319d",
+        "name": "kml feed",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "http://127.0.0.1:1880/traccar.kml",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 380,
+        "y": 240,
+        "wires": [
+            [
+                "ab4d0bb7250e4cd6"
+            ]
+        ]
+    },
+    {
+        "id": "1c98e3711ebab453",
+        "type": "inject",
+        "z": "8236578b47cc319d",
+        "name": "ping",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 200,
+        "wires": [
+            [
+                "6f851fb883d564a2"
+            ]
+        ]
+    },
+    {
+        "id": "1b53d1efba2e845b",
+        "type": "debug",
+        "z": "8236578b47cc319d",
+        "name": "debug 45",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 680,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "ab4d0bb7250e4cd6",
+        "type": "html",
+        "z": "8236578b47cc319d",
+        "name": "",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "Placemark",
+        "ret": "html",
+        "as": "multi",
+        "x": 570,
+        "y": 240,
+        "wires": [
+            [
+                "1b53d1efba2e845b",
+                "637b2c1dd8cba975",
+                "0c8da50d7ed2e7e7"
+            ]
+        ]
+    },
+    {
+        "id": "0c8da50d7ed2e7e7",
+        "type": "html",
+        "z": "8236578b47cc319d",
+        "name": "coord",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "coordinates",
+        "ret": "text",
+        "as": "single",
+        "x": 750,
+        "y": 260,
+        "wires": [
+            [
+                "5bdc4e03fa0fd8c7"
+            ]
+        ]
+    },
+    {
+        "id": "637b2c1dd8cba975",
+        "type": "html",
+        "z": "8236578b47cc319d",
+        "name": "name",
+        "property": "payload",
+        "outproperty": "payload",
+        "tag": "name",
+        "ret": "text",
+        "as": "single",
+        "x": 750,
+        "y": 220,
+        "wires": [
+            [
+                "5bdc4e03fa0fd8c7"
+            ]
+        ]
+    },
+    {
+        "id": "5bdc4e03fa0fd8c7",
+        "type": "join",
+        "z": "8236578b47cc319d",
+        "name": "",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 910,
+        "y": 240,
+        "wires": [
+            [
+                "80c56bcef4065ad4"
+            ]
+        ]
+    },
+    {
+        "id": "38f6f085792d1119",
+        "type": "function",
+        "z": "8236578b47cc319d",
+        "name": "traccar json (spots)",
+        "func": "/* \nExample JSON containing the keys & values for popular cursor on target CoT \nfields, including time, point latitude & longitude, type, and more.\n*/\n\n/* Stale is Date.now() + miliseconds. \n Ruberic: 1000 Miliseconds in 1 Second\n Example: 5 Minutes, in Miliseconds, is 300000\n   (5 x 60 * 1000 )\n*/\nconst short = 10000;\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nconst stale = new Date(Date.now() + short).toISOString();\n\n/*\n\"-16711936\"; //green\n\"-256\"; //yellow\n\"-65536\"; //red\n\"-65536\"; //red\n\"-8947849\"; //grey\n*/\n\nvar name = msg.payload[0][0];\nvar color = \"-256\";\nvar lat = msg.payload[1][0][1];\nvar lon = msg.payload[1][0][0];\nvar alt = msg.payload[1][0][2];\n\n/*\nNot all fields are required for display on most TAK Products, other systems may \nhave different requirements. YMMV.\n*/\n\nmsg.payload = {\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"\"+ name +\"\",\n            \"type\": \"b-m-p-s-m\",\n            \"how\": \"m-g\",\n            \"time\": new Date(Date.now()).toISOString(),\n            \"start\": new Date(Date.now()).toISOString(),\n            \"stale\": stale,\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"\"+ lat +\"\",\n                \"lon\": \"\"+ lon + \"\",\n                \"hae\": \"0.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"usericon\": {\n                \"_attributes\": {\n                    \"iconsetpath\": \"COT_MAPPING_SPOTMAP/b-m-p-s-m/\"+ color +\"\",\n                },\n            },\n            \"contact\": {\n                \"_attributes\": {\n                \"callsign\": \"\"+ name +\"\",\n                }\n            },\n            /* \"__group\": {\n                \"_attributes\": {\n                \"role\": \"Team Member\",\n                \"name\": \"Red\",\n                }\n            }, */\n            \"color\": {\n                \"_attributes\": {\n                \"argb\": \"\"+ color +\"\",\n                \"test\": \"test\",\n                },\n            },\n        }\n    }\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1270,
+        "y": 240,
+        "wires": [
+            [
+                "e4722e8fdb579d53"
+            ]
+        ]
+    },
+    {
+        "id": "80c56bcef4065ad4",
+        "type": "function",
+        "z": "8236578b47cc319d",
+        "name": "split",
+        "func": "var newMsg = msg.payload[1][0];\nvar seperated = newMsg.split(\",\");\nmsg.payload[1][0] = seperated;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 240,
+        "wires": [
+            [
+                "38f6f085792d1119"
+            ]
+        ]
+    },
+    {
+        "id": "e4722e8fdb579d53",
+        "type": "tak",
+        "z": "8236578b47cc319d",
+        "name": "TAK",
+        "x": 1470,
+        "y": 240,
+        "wires": [
+            [
+                "6593baa9a051f57a",
+                "fa78d4a82ee43e8f"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6593baa9a051f57a",
+        "type": "udp out",
+        "z": "8236578b47cc319d",
+        "name": "",
+        "addr": "239.2.3.1",
+        "iface": "",
+        "port": "6969",
+        "ipv": "udp4",
+        "outport": "",
+        "base64": false,
+        "multicast": "multi",
+        "x": 1730,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "fa78d4a82ee43e8f",
+        "type": "debug",
+        "z": "8236578b47cc319d",
+        "name": "debug 49",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1600,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "e23c65f403705d9d",
+        "type": "tcp out",
+        "z": "8236578b47cc319d",
+        "name": "",
+        "host": "10.237.104.20",
+        "port": "8089",
+        "beserver": "client",
+        "base64": false,
+        "end": false,
+        "tls": "1c52b35895c06e7e",
+        "x": 1750,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "462fa9fdb19adc7d",
+        "type": "comment",
+        "z": "8236578b47cc319d",
+        "name": "kmlTakFlow",
+        "info": "node red flow that pushes kml feed as CoT to TAKServer / Multicast",
+        "x": 330,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "1c52b35895c06e7e",
+        "type": "tls-config",
+        "name": "node-red to takserver",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "node-red.pem",
+        "keyname": "node-red.key",
+        "caname": "ca.pem",
+        "servername": "",
+        "verifyservercert": false,
+        "alpnprotocol": ""
+    }
+]
