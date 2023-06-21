@@ -12,8 +12,6 @@ REQUIREMENTS:
 
 -TAKServer (or Multicast supported devices)
 
--WiGLE account to obtain an API Token https://www.wigle.net
-
 -KML Network Link (tested working with Google Earth)
 
 --------------------------------
