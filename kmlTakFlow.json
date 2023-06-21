@@ -27,7 +27,8 @@
         "y": 240,
         "wires": [
             [
-                "ab4d0bb7250e4cd6"
+                "ab4d0bb7250e4cd6",
+                "a71a55dfdccf72e6"
             ]
         ]
     },
@@ -64,15 +65,16 @@
         "id": "1b53d1efba2e845b",
         "type": "debug",
         "z": "8236578b47cc319d",
-        "name": "debug 45",
-        "active": true,
+        "name": "debug placemark",
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 680,
+        "x": 710,
         "y": 100,
         "wires": []
     },
@@ -80,13 +82,13 @@
         "id": "ab4d0bb7250e4cd6",
         "type": "html",
         "z": "8236578b47cc319d",
-        "name": "",
+        "name": "placemark data",
         "property": "payload",
         "outproperty": "payload",
         "tag": "Placemark",
         "ret": "html",
         "as": "multi",
-        "x": 570,
+        "x": 560,
         "y": 240,
         "wires": [
             [
@@ -164,18 +166,19 @@
         "id": "38f6f085792d1119",
         "type": "function",
         "z": "8236578b47cc319d",
-        "name": "traccar json (spots)",
-        "func": "/* \nExample JSON containing the keys & values for popular cursor on target CoT \nfields, including time, point latitude & longitude, type, and more.\n*/\n\n/* Stale is Date.now() + miliseconds. \n Ruberic: 1000 Miliseconds in 1 Second\n Example: 5 Minutes, in Miliseconds, is 300000\n   (5 x 60 * 1000 )\n*/\nconst short = 10000;\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nconst stale = new Date(Date.now() + short).toISOString();\n\n/*\n\"-16711936\"; //green\n\"-256\"; //yellow\n\"-65536\"; //red\n\"-65536\"; //red\n\"-8947849\"; //grey\n*/\n\nvar name = msg.payload[0][0];\nvar color = \"-256\";\nvar lat = msg.payload[1][0][1];\nvar lon = msg.payload[1][0][0];\nvar alt = msg.payload[1][0][2];\n\n/*\nNot all fields are required for display on most TAK Products, other systems may \nhave different requirements. YMMV.\n*/\n\nmsg.payload = {\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"\"+ name +\"\",\n            \"type\": \"b-m-p-s-m\",\n            \"how\": \"m-g\",\n            \"time\": new Date(Date.now()).toISOString(),\n            \"start\": new Date(Date.now()).toISOString(),\n            \"stale\": stale,\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"\"+ lat +\"\",\n                \"lon\": \"\"+ lon + \"\",\n                \"hae\": \"0.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"usericon\": {\n                \"_attributes\": {\n                    \"iconsetpath\": \"COT_MAPPING_SPOTMAP/b-m-p-s-m/\"+ color +\"\",\n                },\n            },\n            \"contact\": {\n                \"_attributes\": {\n                \"callsign\": \"\"+ name +\"\",\n                }\n            },\n            /* \"__group\": {\n                \"_attributes\": {\n                \"role\": \"Team Member\",\n                \"name\": \"Red\",\n                }\n            }, */\n            \"color\": {\n                \"_attributes\": {\n                \"argb\": \"\"+ color +\"\",\n                \"test\": \"test\",\n                },\n            },\n        }\n    }\n};\nreturn msg;",
+        "name": "tak json (spots)",
+        "func": "/* \nExample JSON containing the keys & values for popular cursor on target CoT \nfields, including time, point latitude & longitude, type, and more.\n*/\n\n/* Stale is Date.now() + miliseconds. \n Ruberic: 1000 Miliseconds in 1 Second\n Example: 5 Minutes, in Miliseconds, is 300000\n   (5 x 60 * 1000 )\n*/\nconst short = 10000;\nconst cinco = 5 * 60 * 1000;\nconst diez = 2 * cinco;\nconst stale = new Date(Date.now() + cinco).toISOString();\n\n/*\n\"-16711936\"; //green\n\"-256\"; //yellow\n\"-65536\"; //red\n\"-65536\"; //red\n\"-8947849\"; //grey\n*/\n\nvar name = msg.payload[0][0];\nvar color = \"-256\";\nvar lat = msg.payload[1][0][1];\nvar lon = msg.payload[1][0][0];\nvar alt = msg.payload[1][0][2];\n\n/*\nNot all fields are required for display on most TAK Products, other systems may \nhave different requirements. YMMV.\n*/\n\nmsg.payload = {\n    \"event\": {\n        \"_attributes\": {\n            \"version\": \"2.0\",\n            \"uid\": \"\"+ name +\"\",\n            \"type\": \"b-m-p-s-m\",\n            \"how\": \"m-g\",\n            \"time\": new Date(Date.now()).toISOString(),\n            \"start\": new Date(Date.now()).toISOString(),\n            \"stale\": stale,\n        },\n        \"point\": {\n            \"_attributes\": {\n                \"lat\": \"\"+ lat +\"\",\n                \"lon\": \"\"+ lon + \"\",\n                \"hae\": \"0.0\",\n                \"ce\": \"9999999.0\",\n                \"le\": \"9999999.0\"\n            }\n        },\n        \"detail\": {\n            \"usericon\": {\n                \"_attributes\": {\n                    \"iconsetpath\": \"COT_MAPPING_SPOTMAP/b-m-p-s-m/\"+ color +\"\",\n                },\n            },\n            \"contact\": {\n                \"_attributes\": {\n                \"callsign\": \"\"+ name +\"\",\n                }\n            },\n            \"color\": {\n                \"_attributes\": {\n                \"argb\": \"\"+ color +\"\",\n                },\n            },\n        }\n    }\n};\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1270,
+        "x": 1260,
         "y": 240,
         "wires": [
             [
-                "e4722e8fdb579d53"
+                "e4722e8fdb579d53",
+                "6c00fde6807549b6"
             ]
         ]
     },
@@ -234,15 +237,16 @@
         "id": "fa78d4a82ee43e8f",
         "type": "debug",
         "z": "8236578b47cc319d",
-        "name": "debug 49",
-        "active": true,
+        "name": "debug cot",
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "payload",
+        "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1600,
+        "x": 1610,
         "y": 100,
         "wires": []
     },
@@ -265,10 +269,74 @@
         "id": "462fa9fdb19adc7d",
         "type": "comment",
         "z": "8236578b47cc319d",
-        "name": "kmlTakFlow",
-        "info": "node red flow that pushes kml feed as CoT to TAKServer / Multicast",
-        "x": 330,
-        "y": 140,
+        "name": "README",
+        "info": "REQUIREMENTS:\n\n-Node-Red\n\n-node-red-contrib-tak https://github.com/snstac/node-red-contrib-tak\n\n-TAKServer (or Multicast supported devices)\n\n-WiGLE account to obtain an API Token https://www.wigle.net\n\n-KML Network Link (tested working with Google Earth)\n\nSETUP NODE-RED:\n\n-https://nodered.org/docs/getting-started/\n\n-options include installing node-red on your local PC, a Raspberry Pi or similar single board computer or mini PC, deploying node-red on a cloud server or virtual private server (VPS), Docker Container, or local virtual environment. After installing node-red you should be able to go to the node-red dashboard at http://*nodeRedIPaddress:1880 you may have to open appropriate ports (1880) to allow devices to access the node-red dashboard.\n\nIMPORT .JSON FLOW TO NODE RED:\n\n-in GitHub: click on \"kmlTakFlow.json\" > click on the download icon \"Download raw file\" > note where the \"kmlTakFlow.json\" file downloaded to, default is in your Downloads folder.\n\n-in Node-Red: click on menu icon (3 horizontal lines top right) > click on \"Import\" > click on \"select a file to import\" > go to Downloads folder and click on \"kmlTakFlow.json\" > Upload > Import\n\nALTERNATIVELY..\n\n-you can just copy the whole \"kmlTakFlow.json\" code from GitHub and paste it into the Node-Red Import Clipboard.\n\nCONFIGURE TAKSERVER:\n\n-TAKServer can be hosted on various platforms: Raspberry Pi, Mini PCs, your local PC, Cloud Servers or Virtual Private Servers (VPS), Docker Containers, or Virtual Environments. Regardless, if you're looking for instructions on setting up your TAKServer I recommend ATAKHQs guides https://www.atakhq.com/en/tak-server.\n\n-Configuring the TCP (TAKServer) node in Node-Red wigleTakFlow, Input your TAKServer IP and Port, and checkbox whether you're using SSL/TLS or not. If you are using SSL/TLS, ensure you upload you TAKServer certificates and key that are located in the directory of your TAKServer that stores all client certificates/keys (ie: ubuntu docker container is \"/opt/tak/certs/files\"). I Suggest creating a TAK client \"node-red\" to be used specifically for Node-Reds handling of forwarding data to TAK. In your certificates file you will want to copy and upload \"node-red.pem\" as the \"Certificate\", \"node-red.key\" as the \"Private Key\" and \"ca.pem\" as the \"CA Certificate\" in the TLS Configuration Properties in the TCP (TAKServer) node in Node-Red. You will also need to enter the Passphrase for your TAKServer truststore, this can be found in your TAKServers CoreConfig.xml file. Default is \"atakatak\".\n\nCONFIGURE PING NODE:\n\n-in Node-Red: configure ping node \"repeat\" > \"interval\" and set the frequency of how often the kml feed gets requested and then forwarded to TAK.\n\nCONFIGURE KML FEED NODE:\n\n-in Node-Red: input your kml network link URL (ie: http://yournetworklink.kml).\n\n-understand there has been limited testing with different kml network links, if your kml feed isn't working and this is something you're relying on using please comment on the issue you're having and I will adjust what I can to hopefully get it working.\n\nUSING THE KMLTAKFLOW:\n\n-once your TCP TAKServer node is connected, your kml network link is configured in the kml feed node, and your ping node is configured with your preferred interval ping times, you're ready to start forwarding your kml data to TAK. Open ATAK/iTAK and test to make sure you're receiving CoT either from multicast or the TAKServer.\n\nHOW THE KMLTAKFLOW WORKS:\n\n-the ping node initiates the http GET request.\n\n-the kml feed node provides the network kml url for where to send the http GET request.\n\n-the placemark data node filters and selects from the whole KML payload each \"Placemark\" tag (these can be seen as waypoints, mostly providing both an icon and coordinates).\n\n-the name and coord node separate the name and coordinates from the placemark tag and turn it into an array.\n\n-the join node combines both the name and coordinates for a joint array payload.\n\n-the split node separates the coordinates by LAT LON and ALT instead of a combined string.\n\n-the tak json node grabs all placemark data and formats it into cot json, things like name of CoT icon, color, type of CoT icon and stale time are passed here.\n\n-the TAK node receives json cot and sends it as xml CoT for TAK to understand.\n\n-the TCP/UDP nodes are where the CoT xml gets passed to for TAK devices to then receive.",
+        "x": 260,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "97205406cd06fcf8",
+        "type": "comment",
+        "z": "8236578b47cc319d",
+        "name": "configure TCP (TAKServer)",
+        "info": "if using SSL/TLS ensure you upload your certificates, key and input your passphrase.\nCertificates (.pem) and key (.key) can be found in your TAKServers directory where it stores all TAK client certificates.\nDefualt SSL/TLS port is 8089.\n",
+        "x": 1770,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "e4b3a3d088909ee2",
+        "type": "comment",
+        "z": "8236578b47cc319d",
+        "name": "configure kml feed",
+        "info": "",
+        "x": 370,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "99a09d1bd126200f",
+        "type": "comment",
+        "z": "8236578b47cc319d",
+        "name": "configure ping",
+        "info": "configure ping node and scroll down to repeat and set to interval and input how often you want to update to CoTs to TAK.",
+        "x": 190,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "6c00fde6807549b6",
+        "type": "debug",
+        "z": "8236578b47cc319d",
+        "name": "debug json",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1410,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "a71a55dfdccf72e6",
+        "type": "debug",
+        "z": "8236578b47cc319d",
+        "name": "debug kml",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 100,
         "wires": []
     },
     {
